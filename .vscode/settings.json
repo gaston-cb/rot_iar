@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "quadrature_encoders.h": "c",
+        "pwm_control.h": "c",
+        "stdlib.h": "c",
+        "pwm.h": "c",
+        "pid_digital.h": "c"
+    }
+}
