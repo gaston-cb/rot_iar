@@ -1,3 +1,0 @@
-/home/gvaldez/Documents/control_antena_sc/pico_encoders_altaz/build/pioasm/CMakeFiles/rebuild_cache.dir
-/home/gvaldez/Documents/control_antena_sc/pico_encoders_altaz/build/pioasm/CMakeFiles/edit_cache.dir
-/home/gvaldez/Documents/control_antena_sc/pico_encoders_altaz/build/pioasm/CMakeFiles/pioasm.dir
