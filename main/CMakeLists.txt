@@ -7,6 +7,7 @@ add_executable(main
 )
 
 target_link_libraries(main quadrature_encoders pwm_control pid_digital pico_stdlib)
+
 pico_enable_stdio_usb(main 1) 
 #pico_enable_stdio_uart(main 0) 
 # pull in common dependencies

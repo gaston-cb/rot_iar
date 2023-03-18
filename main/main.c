@@ -8,6 +8,9 @@
  */
 
 #include <stdio.h>
+#include <hardware/clocks.h>
+#include <hardware/timer.h>
+
 #include "pico/stdio.h"
 #include "quadrature_encoders.h"
 #include "pwm_control.h"
@@ -33,7 +36,6 @@ bool systick(struct repeating_timer *t) ;
 
 int main() {
     stdio_init_all() ; 
-    sleep_ms(3000) ; 
     BTS7960_t bridge_h = {
         PORTS_PWM_L,
         PORTS_PWM_R,
@@ -41,19 +43,17 @@ int main() {
         0,
     } ;
     ///FIXME: SET ZERO AND SPIN THE MOTOR 
-    init_pwm( &bridge_h) ; 
+    init_pwm(&bridge_h) ; 
     setttings_pid(KP,KD,KI) ; 
     setZero() ; 
     initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
-
+    sleep_ms(3000) ;
     struct repeating_timer timer;
-    timer.alarm_id = 1 ; 
     add_repeating_timer_ms(SAMPLING_TIME,&systick, NULL, &timer ) ; 
     encoder_quad_t enc ; 
 
     while (1) {
         sleep_ms(1000)  ; 
-        printf("hola como andas ! \r\n")  ;     
         ///! isr_start == true -> fsm_state 
 
     }
@@ -61,7 +61,6 @@ int main() {
 
 
 bool systick(struct repeating_timer *t) { 
-    printf("systick \r\n") ; 
     compute_pid(90.0, 0.001) ;     
     return true ; 
 

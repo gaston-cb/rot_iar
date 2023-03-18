@@ -4,16 +4,16 @@
     // a Pico binary on the host
     "cmake.statusbar.advanced": {
         "debug": {
-            "visibility": "icon"
+            "visibility": "default"
         },
         "launch": {
-            "visibility": "icon"
+            "visibility": "default"
         },
         "build": {
-            "visibility": "icon"
+            "visibility": "default"
         },
         "buildTarget": {
-            "visibility": "icon"
+            "visibility": "default"
         }
     },
     "cortex-debug.openocdPath": "/usr/local/bin/openocd",
@@ -21,6 +21,8 @@
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
-        "hello.pio.h": "c"
+        "hello.pio.h": "c",
+        "pwm_control.h": "c",
+        "quadrature_encoders.h": "c"
     }
 }

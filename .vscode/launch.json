@@ -4,7 +4,7 @@
         {
             "name": "RPICO_debug",
             "cwd": "${workspaceRoot}",
-            "executable": "${workspaceRoot}/build/hello_pio.elf",
+            "executable": "${workspaceRoot}/build/main/main.elf",
             "request": "launch",
             "type":"cortex-debug",
             "servertype": "openocd",

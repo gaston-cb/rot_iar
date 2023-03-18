@@ -14,5 +14,5 @@ target_include_directories(quadrature_encoders PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc)  
 
 
-target_link_libraries(quadrature_encoders pico_stdlib hardware_clocks hardware_timer) 
+target_link_libraries(quadrature_encoders pico_stdlib hardware_clocks hardware_timer hardware_irq) 
 

@@ -1,6 +1,4 @@
 #include "quadrature_encoders.h"
-#include <stdio.h> 
-#include "pico/stdlib.h" 
 #include <string.h>
 #include "hardware/clocks.h"
 #include "hardware/timer.h"
@@ -14,38 +12,41 @@ static void read_state() ;
 
 
 /// @brief internal variables- > method is oo for C 
-static  encoder_quad_t encoder ;
+static encoder_quad_t encoder ;
 static volatile uint8_t count_state  = 0  ; 
-static volatile uint16_t port_chanel_a = 0 ; 
-static volatile uint16_t port_chanel_b = 0; 
+static volatile uint16_t _port_channel_a = 0 ; 
+static volatile uint16_t _port_channel_b = 0; 
 static volatile uint64_t clock_speed ; 
+static struct repeating_timer timer0 ; 
+
+
 
 bool alarma(struct repeating_timer *t){
-    printf("getting started\r\n") ; 
-//    read_state() ; 
+    read_state() ; 
     return true  ; 
 }
 
-void initPorts(uint port_chanel_a, uint port_chanel_b){
+
+void initPorts(uint port_channel_a, uint port_channel_b){
     ///FIXME: manejar errores de canales a,b asociados a puertos 
-    printf("iNICIO DE PORTS \r\n")    ; 
-    port_chanel_a = port_chanel_a     ; 
-    port_chanel_b = port_chanel_b     ; 
-    gpio_init(port_chanel_a)          ;
-    gpio_set_dir(port_chanel_a,false) ; 
-    gpio_pull_up(port_chanel_a) ; 
-    gpio_init(port_chanel_b)  ;
-    gpio_set_dir(port_chanel_b,false) ; 
-    gpio_pull_up(port_chanel_b) ;     
-    gpio_set_irq_enabled(port_chanel_a,GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE  ,true) ; 
-    gpio_set_irq_enabled(port_chanel_b,GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE  ,true) ; 
+    ///       review of registers ! 
+    _port_channel_a = port_channel_a     ; 
+    _port_channel_b = port_channel_b     ; 
+    gpio_init(_port_channel_a)          ;
+    gpio_set_dir(_port_channel_a,false) ; 
+    gpio_pull_up(_port_channel_a) ; 
+    gpio_init(_port_channel_b)  ;
+    gpio_set_dir(_port_channel_b,false) ; 
+    gpio_pull_up(_port_channel_b) ;     
+    encoder.state = ((uint8_t)(gpio_get(_port_channel_a)<<1) |  gpio_get(_port_channel_b)) ; 
+    gpio_set_irq_enabled(_port_channel_a,GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE  ,true) ; 
+    gpio_set_irq_enabled(_port_channel_b,GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE  ,true) ; 
     gpio_set_irq_callback(&gpio_callback_channel_ab);     
-    printf("iNICIO DE PORTS_end \r\n") ; 
 
     irq_set_enabled(IO_IRQ_BANK0, true);
-    struct repeating_timer timer0;
+    //timer0.alarm_id = 0 ; 
     bool ms_al =  add_repeating_timer_ms((int32_t) 800,&alarma, NULL, &timer0 ) ; 
-    printf("init alamr is %s\r\n", ms_al == true ?"true":"false") ; 
+    ///FIXME: ASSERT IF MS_AL == FALSE ! 
 } 
  
 
@@ -55,7 +56,7 @@ void initPorts(uint port_chanel_a, uint port_chanel_b){
 
 void read_state(){ 
     // 0 -> low , !=0 for high --> extract api docs ! 
-    uint8_t new_state   =   ((uint8_t)(gpio_get(port_chanel_a)<<1) |  gpio_get(port_chanel_b))   ; 
+    uint8_t new_state   =   ((uint8_t)(gpio_get(_port_channel_a)<<1) |  gpio_get(_port_channel_b))   ; 
     encoder.direction = (new_state == encoder.state)?COUNTER_STILL:encoder.direction;  
     count_state = 0 ; 
 }
@@ -65,13 +66,13 @@ void read_state(){
 void setZero(){
     encoder.angle = 0 ; 
     encoder.count_pulses = 0 ; 
-    encoder.state = ((uint8_t)(gpio_get(port_chanel_a)<<1) |  gpio_get(port_chanel_b))   ;
+    //3  ;
     encoder.direction = COUNTER_STILL ; 
 }  
 
 
 
-static void fsm_encoder(const state_quad_enc_t new_state){
+void fsm_encoder(const state_quad_enc_t new_state){
     switch(encoder.state){
         case STATE_00:           
             if (new_state == STATE_10){
@@ -271,10 +272,9 @@ static void fsm_encoder(const state_quad_enc_t new_state){
 
 static void gpio_callback_channel_ab(uint gpio,uint32_t event_mask ) { 
     uint8_t new_state ; 
-    
-    
-    if (gpio == port_chanel_a){
-        new_state = gpio_get(port_chanel_b) ; 
+  
+    if (gpio == _port_channel_a){
+        new_state = gpio_get(_port_channel_b) ; 
         if (event_mask == GPIO_IRQ_EDGE_FALL){ 
         ///edge fall -> channel a 1 -> 0
             new_state = 0<<1 | new_state; 
@@ -283,8 +283,8 @@ static void gpio_callback_channel_ab(uint gpio,uint32_t event_mask ) {
             new_state = 1<<1 | new_state; 
         }
 
-    }else if (gpio == port_chanel_b){
-        new_state =  gpio_get(port_chanel_a)<<1 ; 
+    }else if (gpio == _port_channel_b){
+        new_state =  gpio_get(_port_channel_a)<<1 ; 
         if (event_mask == GPIO_IRQ_EDGE_FALL){ 
             new_state = new_state | 0 ; 
 
@@ -294,7 +294,7 @@ static void gpio_callback_channel_ab(uint gpio,uint32_t event_mask ) {
 
 
     }else return ; 
-    
+    ///FIXME: CHANGE FOR A QUEUE 
     fsm_encoder(new_state);  
 }
 
