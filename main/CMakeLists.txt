@@ -6,7 +6,13 @@ add_executable(main
     main.c 
 )
 
-target_link_libraries(main quadrature_encoders pwm_control pid_digital pico_stdlib i2c_slave)
+target_link_libraries( main 
+                       quadrature_encoders 
+                       pwm_control 
+                       pid_digital
+                       pico_stdlib
+                       i2c_slave
+                       fsm_main_app)
 
 pico_enable_stdio_usb(main 1) 
 #pico_enable_stdio_uart(main 0) 

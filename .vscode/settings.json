@@ -20,10 +20,10 @@
     "cortex-debug.gdbPath":"gdb-multiarch",
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-    "files.associations": {
-        "hello.pio.h": "c",
-        "pwm_control.h": "c",
-        "quadrature_encoders.h": "c",
-        "stdlib.h": "c"
-    }
+    // "files.associations": {
+    //     "hello.pio.h": "c",
+    //     "pwm_control.h": "c",
+    //     "quadrature_encoders.h": "c",
+    //     "stdlib.h": "c"
+    // }s
 }
