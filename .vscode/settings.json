@@ -23,6 +23,7 @@
     "files.associations": {
         "hello.pio.h": "c",
         "pwm_control.h": "c",
-        "quadrature_encoders.h": "c"
+        "quadrature_encoders.h": "c",
+        "stdlib.h": "c"
     }
 }

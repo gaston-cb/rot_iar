@@ -12,6 +12,7 @@ add_subdirectory(main)
 add_subdirectory(app/quadrature_encoders) 
 add_subdirectory(app/pwm_control)  
 add_subdirectory(app/pid_digital)   
+add_subdirectory(app/i2c_slave)   
 
 # create map/bin/hex file etc.
 #pico_add_extra_outputs(myproject_test)

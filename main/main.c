@@ -8,10 +8,10 @@
  */
 
 #include <stdio.h>
+#include "pico/stdlib.h"
+
 #include <hardware/clocks.h>
 #include <hardware/timer.h>
-
-#include "pico/stdio.h"
 #include "quadrature_encoders.h"
 #include "pwm_control.h"
 #include "pid_digital.h"
@@ -31,6 +31,9 @@
 #define KD 1.0 
 
 
+static uint8_t clock_pwm = 0 ; 
+static float sp_pwm ; 
+
 
 bool systick(struct repeating_timer *t) ; 
 
@@ -47,21 +50,24 @@ int main() {
     setttings_pid(KP,KD,KI) ; 
     setZero() ; 
     initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
-    sleep_ms(3000) ;
     struct repeating_timer timer;
     add_repeating_timer_ms(SAMPLING_TIME,&systick, NULL, &timer ) ; 
     encoder_quad_t enc ; 
 
     while (1) {
-        sleep_ms(1000)  ; 
-        ///! isr_start == true -> fsm_state 
+        if (clock_pwm == 1){
+            clock_pwm = 0 ; 
+            getData(&enc) ; 
+            printf("angle is %0.2f\r\n",enc.angle) ; 
+            compute_pid(90.0, 0.001) ;     
+        }
 
     }
 }
 
 
 bool systick(struct repeating_timer *t) { 
-    compute_pid(90.0, 0.001) ;     
+    clock_pwm = 1 ; 
     return true ; 
 
 }

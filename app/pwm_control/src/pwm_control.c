@@ -25,7 +25,7 @@ void init_pwm(BTS7960_t *config_port )
     isInit = true ; 
 }
 
-
+//n*T = 0.1ms -> n = 0.1ms/T ->
 void set_pwm(BTS7960_t *config_port ){ 
     ///assert(isInit!=true) ; 
     memcpy(&pwm_ports ,config_port,sizeof(BTS7960_t))          ; 

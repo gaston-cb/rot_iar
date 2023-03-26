@@ -13,7 +13,7 @@
  * constants_of_pid[2] -> constant integral      (K_i)
  * 
 */
-static int constants_of_pid[3] ; 
+static float constants_of_pid[3] ; 
 static int _reference  = 90 ;  ///zenit_position 
 static int error = 0 ; 
 static int last_error = 0 ; 
