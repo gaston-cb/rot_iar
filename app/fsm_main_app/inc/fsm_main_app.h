@@ -16,7 +16,15 @@ typedef enum {
 
 
 void fsm_init() ; 
-void fsm_change() ; 
+void fsm_main_app() ; 
+/**
+ * @brief Get the State object
+ * 
+ * @return w -> waiting 
+ *         a -> alarm   
+ *         t -> tracking  
+ * 
+ */ 
 char getState() ; 
 
 

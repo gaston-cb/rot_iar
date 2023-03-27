@@ -14,5 +14,5 @@ target_include_directories(fsm_main_app PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc)  
 
 
-target_link_libraries(fsm_main_app pico_stdlib ) 
+target_link_libraries(fsm_main_app pico_stdlib pid_digital) 
 

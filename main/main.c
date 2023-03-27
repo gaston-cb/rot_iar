@@ -40,7 +40,9 @@
 static uint8_t clock_pwm = 0 ; 
 static float sp_pwm ; 
 static bool new_cmd ;  
-uint8_t fifo_tx[BUFFER_RX]    ; 
+uint8_t fifo_rx[BUFFER_RX]    ; 
+uint8_t fifo_tx[BUFFER_TX]    ; 
+
 
 
 bool systick(struct repeating_timer *t) ; 
@@ -75,13 +77,15 @@ int main() {
     while (1) {
         if (new_cmd == true){
             new_cmd = false ; 
-            printf("new command receive cb0: %c",(char )fifo_tx[0]) ; 
+            
+            printf("new command receive cb0: %c\r\n",(char )fifo_rx[0]) ; 
         }
-        
-        //if (clock_pwm == 1){
-        //    clock_pwm == 0 ; 
-        //    printf("clock pwm is 1\r\n") ; 
-        //}
+
+        if (clock_pwm == 1){
+//           fsm_main_app()
+           // clock_pwm == 0 ; 
+           // printf("clock pwm is 1\r\n") ; 
+        }
 
     }
 }
@@ -90,25 +94,27 @@ int main() {
 bool systick(struct repeating_timer *t) { 
     clock_pwm = 1 ; 
     return true ; 
-
 }
 
 
 void dma_u1(uint8_t *bufferrx){
     ///buffer rx -> data received of dma channel!  
-    memcpy(fifo_tx,bufferrx ,BUFFER_RX) ; 
+    memcpy(fifo_rx,bufferrx ,BUFFER_RX) ; 
     new_cmd=true ; 
 }  
 
-void dma_u2(uint8_t *buffertx){
-    ///buffer rx -> data received of dma channel!  
-    
-
+void dma_u2(uint16_t *buffertx)
+{
+    uint16_t send_data[BUFFER_TX] ; 
+    encoder_quad_t enc ; 
+    getData(&enc) ; 
+    send_data[0] = (uint8_t )getState() ; 
+    memcpy(buffertx,send_data,BUFFER_TX) ; 
 }  
 
 
 void core1task(void){ 
-    init_I2C(4,5,dma_u1) ;
+    init_I2C(4,5,dma_u1,dma_u2) ;
 
     while(1){
         tight_loop_contents();

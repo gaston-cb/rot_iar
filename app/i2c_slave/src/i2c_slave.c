@@ -15,10 +15,11 @@ static void irq_dma_tx(void) ;
 static void init_dma_rx() ; 
 static void init_dma_tx() ; 
 static prt_dma_rx dma_rx ; 
+static prt_dma_tx dma_tx ; 
 
 
 
-void init_I2C(uint16_t port_a, uint16_t port_b,prt_dma_rx dma_user) { 
+void init_I2C(uint16_t port_a, uint16_t port_b,prt_dma_rx dma_user_rx,prt_dma_tx dma_user_tx ) { 
     ///FIXME:ASSERT_ERROR 
     i2c_init(i2c0,CLK_SPEED) ; 
     //enable dma tx and rx 
@@ -31,7 +32,8 @@ void init_I2C(uint16_t port_a, uint16_t port_b,prt_dma_rx dma_user) {
     i2c0->hw->dma_cr = 0b11 ; 
     init_dma_rx() ; 
     init_dma_tx() ; 
-    dma_rx =  dma_user ; 
+    dma_rx =  dma_user_rx ; 
+    dma_tx =  dma_user_tx ; 
     i2c_get_hw(i2c0)->intr_mask = I2C_IC_INTR_STAT_R_RD_REQ_BITS | I2C_IC_INTR_STAT_R_STOP_DET_BITS | I2C_IC_INTR_STAT_R_TX_ABRT_BITS  ; // | 
     irq_set_exclusive_handler(I2C0_IRQ,irq_dma_tx);
     irq_set_enabled(I2C0_IRQ, true);
@@ -64,7 +66,8 @@ static void irq_dma_tx(void) {
     }   
     if (status & I2C_IC_INTR_STAT_R_RD_REQ_BITS) {
         i2c0->hw->clr_rd_req ; 
-        dma_channel_set_read_addr(channel_dma_rxI2C,buffer_txI2C,true) ; 
+        dma_tx( buffer_txI2C) ; 
+        dma_channel_set_read_addr(channel_dma_txI2C,buffer_txI2C,true) ; 
    
     }
 
