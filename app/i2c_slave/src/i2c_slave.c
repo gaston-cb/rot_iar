@@ -1,4 +1,6 @@
 #include "i2c_slave.h" 
+#include <stdio.h> 
+
 #include "hardware/i2c.h"
 
 #include "hardware/irq.h"
@@ -10,13 +12,13 @@ uint8_t buffer_rxI2C[BUFFER_RX] ;
 uint16_t buffer_txI2C[BUFFER_TX] ; 
 static void irq_dma_rx(void ) ; 
 static void irq_dma_tx(void) ; 
-
 static void init_dma_rx() ; 
 static void init_dma_tx() ; 
+static prt_dma_rx dma_rx ; 
 
 
 
-void init_I2C(uint16_t port_a, uint16_t port_b) { 
+void init_I2C(uint16_t port_a, uint16_t port_b,prt_dma_rx dma_user) { 
     ///FIXME:ASSERT_ERROR 
     i2c_init(i2c0,CLK_SPEED) ; 
     //enable dma tx and rx 
@@ -29,6 +31,7 @@ void init_I2C(uint16_t port_a, uint16_t port_b) {
     i2c0->hw->dma_cr = 0b11 ; 
     init_dma_rx() ; 
     init_dma_tx() ; 
+    dma_rx =  dma_user ; 
     i2c_get_hw(i2c0)->intr_mask = I2C_IC_INTR_STAT_R_RD_REQ_BITS | I2C_IC_INTR_STAT_R_STOP_DET_BITS | I2C_IC_INTR_STAT_R_TX_ABRT_BITS  ; // | 
     irq_set_exclusive_handler(I2C0_IRQ,irq_dma_tx);
     irq_set_enabled(I2C0_IRQ, true);
@@ -40,7 +43,8 @@ void init_I2C(uint16_t port_a, uint16_t port_b) {
 static void irq_dma_rx(void ){ 
     hw_set_bits(&dma_hw->ints0,1<<channel_dma_rxI2C) ; 
     dma_channel_set_write_addr(channel_dma_rxI2C, buffer_rxI2C,true) ; 
-    channel_dma_rxI2C = true ; 
+    dma_rx(buffer_rxI2C) ; 
+
 }
 
 

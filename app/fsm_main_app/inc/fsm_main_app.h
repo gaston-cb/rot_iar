@@ -17,6 +17,8 @@ typedef enum {
 
 void fsm_init() ; 
 void fsm_change() ; 
+char getState() ; 
+
 
 void park() ; 
 void readAngle() ; 

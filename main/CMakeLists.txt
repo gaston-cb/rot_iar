@@ -11,6 +11,7 @@ target_link_libraries( main
                        pwm_control 
                        pid_digital
                        pico_stdlib
+                       pico_multicore
                        i2c_slave
                        fsm_main_app)
 

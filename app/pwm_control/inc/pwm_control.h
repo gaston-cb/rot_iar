@@ -9,7 +9,11 @@ typedef struct{
     uint percent_h  ; 
 }BTS7960_t  ;  
 
-
+/**
+ * @brief 
+ * 
+ * @param config_ports: define una estructura ....  
+ */
 void init_pwm(BTS7960_t  *config_ports) ; 
 void set_pwm(BTS7960_t *config_port ) ; 
 void get_pwm(BTS7960_t *config_port)    ; 

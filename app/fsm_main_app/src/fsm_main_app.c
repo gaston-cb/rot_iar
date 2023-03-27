@@ -29,14 +29,32 @@ void fsm_change() {
             break;
     }
 
-
-
 }
 
 
+char getState(){
+    char st ; 
+    switch (_state)
+    {
+    case WAITING: 
+        st = 'w'  ; 
+        break;
+    case TRACKING:
+        st = 't' ; 
+        break ; 
+    case ALARM: 
+        st = 'a' ; 
+        break ; 
+    default:
+        st = 'e' ; 
+        break;
+    }
+    return st ; 
+}
 
 
 void park() {
+
 
 } 
 
@@ -46,7 +64,7 @@ void readAngle() {
 
 }  
 void controlPositions(void) {
-
+    
 
 
 }   
