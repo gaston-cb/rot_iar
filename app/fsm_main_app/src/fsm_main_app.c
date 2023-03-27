@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <pico/stdlib.h>
 #include "fsm_main_app.h" 
 #include "pid_digital.h"
@@ -67,7 +68,10 @@ void evHANDLER(event_t _evrx){
     switch (_evrx)
     {
         case evTRACK:
-            
+            if (last_state == WAITING){ 
+                ///FIXME:VIEW ANGLE IS VALID NUMBER 
+                _state = TRACKING ; 
+            }
 
             break;
         case evWAIT:
@@ -75,8 +79,9 @@ void evHANDLER(event_t _evrx){
             _state = WAITING ; 
             break;
         case evALARM:
+                ///FIXME:VIEW ANGLE IS VALID NUMBER 
+           _state = ALARM ; 
             position= 90.0 ; 
-            _state = ALARM ; 
             break;
         default:
             break;
@@ -87,9 +92,7 @@ void evHANDLER(event_t _evrx){
 
 
 void park() {
-
     compute_pid(position, clok_sample_ ) ; 
-
 } 
 
 
@@ -114,13 +117,21 @@ void cmd_receiveI2C(uint8_t *buffer_receive,size_t length) {
     switch (rx_cmd)
     {
     case 'a':
-        
+        evHANDLER(evALARM) ; 
         break;
     case 'w': 
+        printf("evWait \r\n") ; 
+        evHANDLER(evWAIT) ; 
         break ; 
     case 't': 
+        evHANDLER(evTRACK)  ; 
         break ; 
     case 'p': 
+        printf("evPosition \r\n") ;
+    
+        ///CHANGE _POS TO NEW POSITION USING A FLOAT ; readAngle()
+//        evHANDLER(evALARM) 
+
         break ; 
     default:
         break;

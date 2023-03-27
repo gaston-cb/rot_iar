@@ -14,6 +14,7 @@ add_subdirectory(app/pwm_control)
 add_subdirectory(app/pid_digital)   
 add_subdirectory(app/i2c_slave)   
 add_subdirectory(app/fsm_main_app)   
+add_subdirectory(app/limit_switch)   
 
 # create map/bin/hex file etc.
 #pico_add_extra_outputs(myproject_test)

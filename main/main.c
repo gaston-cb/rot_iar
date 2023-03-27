@@ -61,14 +61,12 @@ int main() {
     } ;
     
     ///FIXME: SET ZERO AND SPIN THE MOTOR 
-    // init_pwm(&bridge_h) ;
-    // bridge_h.pwmh =MAX ; bridge_h.pwml = 0   
-    // set_pwm(BTS7960_t *config_port )
-    // WAIT_IRQ_GPIO_NORTH 
-    // initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
-    // setZero() ; 
-    // setttings_pid(KP,KD,KI) ; 
-
+    init_pwm(&bridge_h) ;
+    bridge_h.percent_l =255 ; bridge_h.percent_h = 0   ;
+    set_pwm(&bridge_h);
+    initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
+    setZero() ; 
+    setttings_pid(KP,KD,KI) ; 
 
     multicore_launch_core1(core1task); ///START CORE1 
     struct repeating_timer timer;
@@ -77,7 +75,7 @@ int main() {
     while (1) {
         if (new_cmd == true){
             new_cmd = false ; 
-            //cmd_receiveI2C(uint8_t *buffer_receive) ; 
+            cmd_receiveI2C(fifo_rx,BUFFER_RX) ; 
         }
 
         if (clock_pwm == 1){
