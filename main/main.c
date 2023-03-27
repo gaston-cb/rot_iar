@@ -12,7 +12,7 @@
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
-
+#include "fsm_main_app.h"
 #include <hardware/clocks.h>
 #include <hardware/timer.h>
 #include "quadrature_encoders.h"
@@ -77,14 +77,11 @@ int main() {
     while (1) {
         if (new_cmd == true){
             new_cmd = false ; 
-            
-            printf("new command receive cb0: %c\r\n",(char )fifo_rx[0]) ; 
+            //cmd_receiveI2C(uint8_t *buffer_receive) ; 
         }
 
         if (clock_pwm == 1){
-//           fsm_main_app()
-           // clock_pwm == 0 ; 
-           // printf("clock pwm is 1\r\n") ; 
+           fsm_main_app() ; 
         }
 
     }

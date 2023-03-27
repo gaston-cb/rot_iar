@@ -1,5 +1,7 @@
+#include <pico/stdlib.h>
 #include "fsm_main_app.h" 
 #include "pid_digital.h"
+
 
 static fsm_main_app_t _state ; 
 static float position ; 
@@ -7,7 +9,8 @@ event_t evCHANGE_STATE ;
 static float clok_sample_ = 0 ; 
 
 
-void fsm_init()  {
+void fsm_init(float clock_init)  {
+
     _state = WAITING ; 
 } 
 
@@ -60,10 +63,12 @@ char getState(){
  *                 evALARM,  
  */
 void evHANDLER(event_t _evrx){ 
+    fsm_main_app_t last_state = _state ;  
     switch (_evrx)
     {
         case evTRACK:
-            _state = TRACKING ; 
+            
+
             break;
         case evWAIT:
             position= 90.0 ; 
@@ -71,7 +76,6 @@ void evHANDLER(event_t _evrx){
             break;
         case evALARM:
             position= 90.0 ; 
-
             _state = ALARM ; 
             break;
         default:
@@ -83,6 +87,8 @@ void evHANDLER(event_t _evrx){
 
 
 void park() {
+
+    compute_pid(position, clok_sample_ ) ; 
 
 } 
 
@@ -97,7 +103,27 @@ void readAngle(float new_position) {
 
 }  
 void controlPositions(void) {
-    // compute_pid(sp, period_clk ) // time in seconds unit     
+    compute_pid(position, clok_sample_ ) ;  // time in seconds unit     
 
 
 }   
+
+
+void cmd_receiveI2C(uint8_t *buffer_receive,size_t length) { 
+    char rx_cmd =(char ) buffer_receive[0] ; 
+    switch (rx_cmd)
+    {
+    case 'a':
+        
+        break;
+    case 'w': 
+        break ; 
+    case 't': 
+        break ; 
+    case 'p': 
+        break ; 
+    default:
+        break;
+    }
+
+}

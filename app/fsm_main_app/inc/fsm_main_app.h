@@ -15,7 +15,7 @@ typedef enum {
 
 
 
-void fsm_init() ; 
+void fsm_init(float clock_sample) ; 
 void fsm_main_app() ; 
 /**
  * @brief Get the State object
@@ -29,6 +29,6 @@ char getState() ;
 
 
 void park() ; 
-void readAngle() ; 
+void readAngle(float pos) ; 
 void controlPositions(void) ; 
-
+void cmd_receiveI2C(uint8_t *buffer_receive,size_t length)  ;  
