@@ -19,6 +19,7 @@
 #include "pwm_control.h"
 #include "pid_digital.h"
 #include "i2c_slave.h"
+#include "limit_switch.h"
 
 #define PORTS_PWM_L  16 
 #define PORTS_PWM_L0 17 
@@ -31,6 +32,8 @@
 /// TIME IN MS 
 #define SAMPLING_TIME 1 
 
+#define PORT_SWITCH_0 14
+#define PORT_SWITCH_1 15  
 
 #define KP 1.0
 #define KI 1.0 
@@ -60,18 +63,19 @@ int main() {
         0,
     } ;
     
-    ///FIXME: SET ZERO AND SPIN THE MOTOR 
     init_pwm(&bridge_h) ;
-    bridge_h.percent_l =255 ; bridge_h.percent_h = 0   ;
+    init_switch(PORT_SWITCH_0,PORT_SWITCH_1)  ; 
+    bridge_h.percent_l =255 ; 
+    bridge_h.percent_h = 0   ;
     set_pwm(&bridge_h);
-    initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
+    while( isSwitchOn() != 1) ; 
     setZero() ; 
+    initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
     setttings_pid(KP,KD,KI) ; 
-
     multicore_launch_core1(core1task); ///START CORE1 
     struct repeating_timer timer;
     add_repeating_timer_ms(SAMPLING_TIME,&systick, NULL, &timer ) ; 
-    
+    fsm_init(0.001) ; 
     while (1) {
         if (new_cmd == true){
             new_cmd = false ; 
@@ -103,7 +107,12 @@ void dma_u2(uint16_t *buffertx)
     uint16_t send_data[BUFFER_TX] ; 
     encoder_quad_t enc ; 
     getData(&enc) ; 
+    ///enc.float convert to a byte for a send to master 
     send_data[0] = (uint8_t )getState() ; 
+    send_data[1] =    (uint8_t) ((0xFF00 & ( (uint16_t) enc.angle))>>8) ; 
+    send_data[2] =   (uint8_t)
+                   ((0x00FF &  ((uint16_t) enc.angle))) ;
+    send_data[3] =    (uint8_t)  ((enc.angle - (uint16_t) enc.angle )*100) ;  
     memcpy(buffertx,send_data,BUFFER_TX) ; 
 }  
 

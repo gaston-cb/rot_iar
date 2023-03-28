@@ -11,7 +11,7 @@ typedef struct {
 
 void init_switch(uint switch_port_a, uint switch_port_b) ; 
 
-bool isSwitchOn() ; 
+uint8_t isSwitchOn() ; 
 
 /**
  * @brief Tiene la función de elegir la forma de detectar el fin de carrera ->low or high level 

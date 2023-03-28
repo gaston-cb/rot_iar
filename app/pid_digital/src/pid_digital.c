@@ -48,6 +48,7 @@ void compute_pid(float sp, float period_sample) {
                error_integral* constants_of_pid[2] ; 
     
     last_error = error ; 
+    ///ver si esta trabado el encoder ! 
     if (signal_u>0){
         pwm_motor.percent_h = (uint16_t) (signal_u*(TOP_VALUE_COUNT)/100.0 ) ; 
         pwm_motor.percent_l = 0 ; 

@@ -20,6 +20,9 @@
     "cortex-debug.gdbPath":"gdb-multiarch",
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.associations": {
+        "limits.h": "c"
+    },
     // "files.associations": {
     //     "hello.pio.h": "c",
     //     "pwm_control.h": "c",

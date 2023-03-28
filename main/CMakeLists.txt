@@ -13,7 +13,8 @@ target_link_libraries( main
                        pico_stdlib
                        pico_multicore
                        i2c_slave
-                       fsm_main_app)
+                       fsm_main_app
+                       limit_switch)
 
 pico_enable_stdio_usb(main 1) 
 #pico_enable_stdio_uart(main 0) 
