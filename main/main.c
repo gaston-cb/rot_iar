@@ -37,7 +37,7 @@
 
 #define KP 1.0
 #define KI 1.0 
-#define KD 1.0 
+#define KD 0.0 
 
 
 static uint8_t clock_pwm = 0 ; 
@@ -55,14 +55,14 @@ void core1task(void) ;
 
 int main() {
     stdio_init_all() ; 
-    
+    sleep_ms(1000) ; 
     BTS7960_t bridge_h = {
         PORTS_PWM_L,
         PORTS_PWM_R,
         0,
         0,
     } ;
-    
+    printf("INICIO DE ROTADOR ROT_IAR \r\n") ;     
     init_pwm(&bridge_h) ;
     init_switch(PORT_SWITCH_0,PORT_SWITCH_1)  ; 
     bridge_h.percent_l =255 ; 
@@ -73,9 +73,10 @@ int main() {
     initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
     setttings_pid(KP,KD,KI) ; 
     multicore_launch_core1(core1task); ///START CORE1 
-    struct repeating_timer timer;
+    struct repeating_timer timer                                  ;
     add_repeating_timer_ms(SAMPLING_TIME,&systick, NULL, &timer ) ; 
     fsm_init(0.001) ; 
+    printf("FSM_ON \r\n") ;     
     while (1) {
         if (new_cmd == true){
             new_cmd = false ; 
@@ -102,18 +103,21 @@ void dma_u1(uint8_t *bufferrx){
     new_cmd=true ; 
 }  
 
-void dma_u2(uint16_t *buffertx)
+volatile void dma_u2(uint16_t *buffertx)
 {
-    uint16_t send_data[BUFFER_TX] ; 
+//    uint16_t send_data[BUFFER_TX] ; 
     encoder_quad_t enc ; 
     getData(&enc) ; 
-    ///enc.float convert to a byte for a send to master 
-    send_data[0] = (uint8_t )getState() ; 
-    send_data[1] =    (uint8_t) ((0xFF00 & ( (uint16_t) enc.angle))>>8) ; 
-    send_data[2] =   (uint8_t)
+    printf("angle is a %0.2f\r\n",enc.angle) ;
+    buffertx[0] = (uint16_t )getState() ; 
+    buffertx[1] =    (uint16_t) ((0xFF00 & ( (uint16_t) enc.angle))>>8) ; 
+    buffertx[2] =   (uint16_t)
                    ((0x00FF &  ((uint16_t) enc.angle))) ;
-    send_data[3] =    (uint8_t)  ((enc.angle - (uint16_t) enc.angle )*100) ;  
-    memcpy(buffertx,send_data,BUFFER_TX) ; 
+    buffertx[3] =    (uint16_t)  ((enc.angle - (uint16_t) enc.angle )*100) ;  
+  //  printf("angle is a %0.2f\r\n",enc.angle) ;
+  //  printf("bytes to send:  %04x %04x %04x %04x \r\n",send_data[0], send_data[1],send_data[2],send_data[3]) ;
+    
+   // memcpy(buffertx,send_data,BUFFER_TX) ; 
 }  
 
 

@@ -66,9 +66,8 @@ static void irq_dma_tx(void) {
     }   
     if (status & I2C_IC_INTR_STAT_R_RD_REQ_BITS) {
         i2c0->hw->clr_rd_req ; 
-        dma_tx( buffer_txI2C) ; 
+        dma_tx(buffer_txI2C) ; 
         dma_channel_set_read_addr(channel_dma_txI2C,buffer_txI2C,true) ; 
-   
     }
 
 
@@ -116,7 +115,3 @@ static void init_dma_tx(){
 
 } 
 
-
-void pushfifo(){ 
-    tight_loop_contents()  ;
-}

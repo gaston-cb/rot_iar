@@ -11,6 +11,7 @@ static float clok_sample_ = 0 ;
 
 
 void fsm_init(float clock_init)  {
+    position=90.0 ; 
     clok_sample_ = clock_init ; 
     _state = WAITING ; 
 } 
@@ -69,7 +70,6 @@ void evHANDLER(event_t _evrx){
     {
         case evTRACK:
             if (last_state == WAITING){ 
-                ///FIXME:VIEW ANGLE IS VALID NUMBER 
                 _state = TRACKING ; 
             }
 
@@ -116,7 +116,8 @@ void cmd_receiveI2C(uint8_t *buffer_receive,size_t length) {
     char rx_cmd =(char ) buffer_receive[0] ; 
     switch (rx_cmd)
     {
-    case 'a':
+    case 'a':        
+        printf("evALARM\r\n") ; 
         evHANDLER(evALARM) ; 
         break;
     case 'w': {
@@ -131,7 +132,17 @@ void cmd_receiveI2C(uint8_t *buffer_receive,size_t length) {
         }
         break ; 
     case 't': 
+        {printf("evTRACK\r\n") ; 
         evHANDLER(evTRACK)  ; 
+        float c1  = (float)  ((((uint16_t) buffer_receive[1])<<8) |  (((uint16_t) buffer_receive[2]))) 
+                    +(float ) (buffer_receive[3]/100.0); 
+            if (c1>=0.0 && c1<=360.0){ 
+                readAngle(c1) ; 
+                evHANDLER(evWAIT) ; 
+            }
+
+        }
+
         break ; 
     case 'p': 
         {

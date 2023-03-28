@@ -1,5 +1,5 @@
 #include "pico/stdlib.h"
-#define BUFFER_TX 5 
+#define BUFFER_TX 4 
 #define BUFFER_RX 4
 #define SLAVE_I2C 70 
 #define CLK_SPEED 100000 

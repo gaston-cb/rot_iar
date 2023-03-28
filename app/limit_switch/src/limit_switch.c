@@ -9,6 +9,9 @@ void init_switch(uint switch_port_a, uint switch_port_b){
     gpio_set_dir(switch_port_a,false) ; 
     gpio_init(switch_port_b)          ;
     gpio_set_dir(switch_port_b,false) ; 
+    gpio_pull_up(switch_port_b) ; 
+    gpio_pull_up(switch_port_a) ; 
+    
     limit_switch.limit_switch_port_a = switch_port_a ; 
     limit_switch.limit_switch_port_b = switch_port_b ; 
    
