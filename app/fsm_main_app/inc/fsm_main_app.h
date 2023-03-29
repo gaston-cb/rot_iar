@@ -1,3 +1,5 @@
+#define MAX_ANGLE  
+#define MIN_ANGLE  
 
 
 typedef enum {

@@ -21,7 +21,8 @@
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
-        "limits.h": "c"
+        "limits.h": "c",
+        "fsm_main_app.h": "c"
     },
     // "files.associations": {
     //     "hello.pio.h": "c",

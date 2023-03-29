@@ -33,15 +33,14 @@ void setttings_pid(float proportional, float derivative, float integral){
 
 
 void compute_pid(float sp, float period_sample) {
-    int error_integral  ; 
-    int error_derivativo; 
-    int error_constante ; 
-    int signal_u  ; 
+    float error_integral  ; 
+    float error_derivativo; 
+    float error_constante ; 
+    float signal_u  ; 
     _reference = sp ; 
     getData(&_encoder) ;     
      error = sp - _encoder.angle            ; 
     //last_error = error  ;
-    error = (error<0)?-1*error:error ; 
     error_integral = (error + last_error)  ; 
     error_derivativo = (error - last_error)/period_sample ; 
     signal_u = error* constants_of_pid[0]+ 
@@ -50,14 +49,14 @@ void compute_pid(float sp, float period_sample) {
     
     last_error = error  ; 
     ///ver si esta trabado el encoder ! 
-    if ( sp - _encoder.angle>0){
+    if ( sp - _encoder.angle >0){
         pwm_motor.percent_h = (uint16_t) (signal_u*(TOP_VALUE_COUNT)/100.0 ) ; 
         pwm_motor.percent_l = 0 ; 
-    }else if( sp - _encoder.angle == 0){
+    }else if( sp - _encoder.angle  == 0){
         pwm_motor.percent_l = 0 ; 
         pwm_motor.percent_h = 0 ; 
-    }else if ( sp - _encoder.angle <0){ 
-        error = -1.0*error ;        
+    }else if ( sp - _encoder.angle  <0){ 
+        signal_u = -1.0*signal_u ;        
         pwm_motor.percent_h = 0 ;      
         pwm_motor.percent_l = (uint16_t) (  signal_u*(TOP_VALUE_COUNT)/100.0 ) ; 
     }

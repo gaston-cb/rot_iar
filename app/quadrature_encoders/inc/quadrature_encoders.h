@@ -1,6 +1,6 @@
 #include "pico/stdlib.h"
-#define MAX_COUNT_PULSES_PER_REV 600  
-#define CONVERSION_PULSES_FACTOR (360.0/600.0) //--> THIS A CONVERSION FACTOR USES FOR A TEST HW!!  
+#define MAX_COUNT_PULSES_PER_REV 1190  
+#define CONVERSION_PULSES_FACTOR (360.0/1190.0) //--> THIS A CONVERSION FACTOR USES FOR A TEST HW!!  
 #define DELAY_SIGNAL 800 /// time signal for a control of still state encoder_t 
 
 

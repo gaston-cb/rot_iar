@@ -71,6 +71,7 @@ void evHANDLER(event_t _evrx){
         case evTRACK:
             if (last_state == WAITING){ 
                 _state = TRACKING ; 
+
             }
 
             break;
@@ -120,25 +121,20 @@ void cmd_receiveI2C(uint8_t *buffer_receive,size_t length) {
         printf("evALARM\r\n") ; 
         evHANDLER(evALARM) ; 
         break;
-    case 'w': {
+    case 'w': 
             printf("evWait \r\n") ; 
             evHANDLER(evWAIT) ; 
+           
+        break ; 
+    case 't': 
+        {
+            printf("evTRACK\r\n") ; 
+            evHANDLER(evTRACK)  ; 
             float c1  = (float)  ((((uint16_t) buffer_receive[1])<<8) |  (((uint16_t) buffer_receive[2]))) 
                     +(float ) (buffer_receive[3]/100.0); 
             if (c1>=0.0 && c1<=360.0){ 
+                printf ("new position of sp = %0.2f",c1) ; 
                 readAngle(c1) ; 
-                evHANDLER(evWAIT) ; 
-            }
-        }
-        break ; 
-    case 't': 
-        {printf("evTRACK\r\n") ; 
-        evHANDLER(evTRACK)  ; 
-        float c1  = (float)  ((((uint16_t) buffer_receive[1])<<8) |  (((uint16_t) buffer_receive[2]))) 
-                    +(float ) (buffer_receive[3]/100.0); 
-            if (c1>=0.0 && c1<=360.0){ 
-                readAngle(c1) ; 
-                evHANDLER(evWAIT) ; 
             }
 
         }

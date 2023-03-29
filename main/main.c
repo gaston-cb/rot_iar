@@ -35,10 +35,13 @@
 #define PORT_SWITCH_0 14
 #define PORT_SWITCH_1 15  
 
-#define KP 1.0
-#define KI 1.0 
+#define KP 5.0
+#define KI 2.0 
 #define KD 0.0 
 
+//#define KP 2.0
+//#define KI 5.2 
+//#define KD 0.1 
 
 static uint8_t clock_pwm = 0 ; 
 static float sp_pwm ; 
@@ -50,7 +53,7 @@ uint8_t fifo_tx[BUFFER_TX]    ;
 
 bool systick(struct repeating_timer *t) ; 
 void core1task(void) ; 
-
+volatile uint16_t counter_test = 0 ; 
 
 
 int main() {
@@ -64,11 +67,11 @@ int main() {
     } ;
     printf("INICIO DE ROTADOR ROT_IAR \r\n") ;     
     init_pwm(&bridge_h) ;
-    init_switch(PORT_SWITCH_0,PORT_SWITCH_1)  ; 
-    bridge_h.percent_l =255 ; 
-    bridge_h.percent_h = 0   ;
-    set_pwm(&bridge_h);
-    while( isSwitchOn() != 1) ; 
+    //init_switch(PORT_SWITCH_0,PORT_SWITCH_1)  ; 
+    //bridge_h.percent_l =255 ; 
+    //bridge_h.percent_h = 0   ;
+    //set_pwm(&bridge_h);
+    //while( isSwitchOn() != 1) ; 
     setZero() ; 
     initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
     setttings_pid(KP,KD,KI) ; 
@@ -76,7 +79,8 @@ int main() {
     struct repeating_timer timer                                  ;
     add_repeating_timer_ms(SAMPLING_TIME,&systick, NULL, &timer ) ; 
     fsm_init(0.001) ; 
-    printf("FSM_ON \r\n") ;     
+    printf("FSM_ON \r\n") ;
+    encoder_quad_t enc_test ; 
     while (1) {
         if (new_cmd == true){
             new_cmd = false ; 
@@ -86,13 +90,19 @@ int main() {
         if (clock_pwm == 1){
            fsm_main_app() ; 
         }
-
+        if (counter_test >= 1000){
+            counter_test = 0 ; 
+            getData(&enc_test) ;      
+            printf("position is a : %0.2f \r\n",enc_test.angle )  ;
+        }
     }
 }
 
 
 bool systick(struct repeating_timer *t) { 
     clock_pwm = 1 ; 
+    counter_test++ ; 
+
     return true ; 
 }
 
@@ -105,19 +115,14 @@ void dma_u1(uint8_t *bufferrx){
 
 volatile void dma_u2(uint16_t *buffertx)
 {
-//    uint16_t send_data[BUFFER_TX] ; 
     encoder_quad_t enc ; 
     getData(&enc) ; 
     printf("angle is a %0.2f\r\n",enc.angle) ;
-    buffertx[0] = (uint16_t )getState() ; 
-    buffertx[1] =    (uint16_t) ((0xFF00 & ( (uint16_t) enc.angle))>>8) ; 
-    buffertx[2] =   (uint16_t)
-                   ((0x00FF &  ((uint16_t) enc.angle))) ;
-    buffertx[3] =    (uint16_t)  ((enc.angle - (uint16_t) enc.angle )*100) ;  
-  //  printf("angle is a %0.2f\r\n",enc.angle) ;
-  //  printf("bytes to send:  %04x %04x %04x %04x \r\n",send_data[0], send_data[1],send_data[2],send_data[3]) ;
-    
-   // memcpy(buffertx,send_data,BUFFER_TX) ; 
+    buffertx[0] = (uint16_t) getState() ; 
+    buffertx[1] = (uint16_t)((0xFF00 & ( (uint16_t) enc.angle))>>8) ; 
+    buffertx[2] = (uint16_t)((0x00FF &  ((uint16_t) enc.angle))) ;
+    buffertx[3] = (uint16_t)((enc.angle - (uint16_t) enc.angle )*100) ;  
+
 }  
 
 
@@ -126,7 +131,6 @@ void core1task(void){
 
     while(1){
         tight_loop_contents();
-
     }
 
 
