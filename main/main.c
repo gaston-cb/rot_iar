@@ -21,23 +21,24 @@
 #include "i2c_slave.h"
 #include "limit_switch.h"
 
-#define PORTS_PWM_L  16 
-#define PORTS_PWM_L0 17 
-#define PORTS_PWM_R  18
-#define PORTS_PWM_R0 19 
-#define PORTS_ENCODER_A 20
-#define PORTS_ENCODER_B 21
+#define RPWM   16 
+#define LPWM   18 
+//#define RPWM_0 18
+//#define RPWM_0 19 
+
+#define A_ENC 20
+#define B_ENC 21
 #define PORTS_I2C_SDA 4
 #define PORTS_I2C_SCL 5
 /// TIME IN MS 
-#define SAMPLING_TIME 1 
+#define SAMPLING_TIME 1 ///TIME SAMPLING IN miliseconds 
 
-#define PORT_SWITCH_0 14
-#define PORT_SWITCH_1 15  
+#define FINAL_A 27
+#define FINAL_B 28  
 
-#define KP 5.0
-#define KI 2.0 
-#define KD 0.0 
+#define KP 0.0
+#define KI 0.0 
+#define KD 0.8 
 
 //#define KP 2.0
 //#define KI 5.2 
@@ -57,30 +58,77 @@ volatile uint16_t counter_test = 0 ;
 
 
 int main() {
-    stdio_init_all() ; 
-    sleep_ms(1000) ; 
+    encoder_quad_t enc_test ; 
     BTS7960_t bridge_h = {
-        PORTS_PWM_L,
-        PORTS_PWM_R,
+        RPWM,
+        LPWM,
         0,
         0,
     } ;
+
+    stdio_init_all() ; 
     printf("INICIO DE ROTADOR ROT_IAR \r\n") ;     
-    init_pwm(&bridge_h) ;
-    //init_switch(PORT_SWITCH_0,PORT_SWITCH_1)  ; 
-    //bridge_h.percent_l =255 ; 
-    //bridge_h.percent_h = 0   ;
-    //set_pwm(&bridge_h);
-    //while( isSwitchOn() != 1) ; 
+    init_pwm(&bridge_h)           ;        /// inicio de pwm 
+    initPorts(A_ENC,B_ENC)        ;        /// inicio de encoders 
+    init_switch(FINAL_A,FINAL_B)  ;        /// lectura de fin de carrera  
+    bridge_h.percent_l = TOP_VALUE_COUNT ; 
+    bridge_h.percent_r = 0               ;
+    set_pwm(&bridge_h);
+    while( isSwitchOn() != 1) ; 
     setZero() ; 
-    initPorts(PORTS_ENCODER_A,PORTS_ENCODER_B) ; 
+    bridge_h.percent_l = 0 ; 
+    bridge_h.percent_r = TOP_VALUE_COUNT ;
+    set_pwm(&bridge_h)   ;
+    while( isSwitchOn() != 2) ; 
+    /// 
+    ///search a min pwm using for a clockwise 
+    bridge_h.percent_l = TOP_VALUE_COUNT ; 
+    bridge_h.percent_r = 0 ;
+    set_pwm(&bridge_h)   ;
+    sleep_ms(1000) ; 
+    bridge_h.percent_l = 0 ; 
+    bridge_h.percent_r = 0 ;
+    set_pwm(&bridge_h)   ;
+    sleep_ms(10) ; 
+    getData(&enc_test) ;   
+    int16_t angle_init  = enc_test.angle ; 
+    uint16_t min_pwm_sa ; 
+    uint16_t min_pwm_sh ; 
+    bridge_h.percent_r = 0 ;  
+    for (uint16_t i = 0; i<TOP_VALUE_COUNT;i++){
+        bridge_h.percent_l = i ; 
+
+        set_pwm(&bridge_h)   ;
+        sleep_ms(100) ; 
+        getData(&enc_test) ;   
+
+        if (angle_init != enc_test.count_pulses){
+            set_minsh(i) ; 
+            break ; 
+        }
+    }
+    sleep_ms(10) ; 
+    bridge_h.percent_r = 0 ; 
+    bridge_h.percent_l = 0 ; 
+    set_pwm(&bridge_h)   ;
+    sleep_ms(10) ; 
+    getData(&enc_test) ;  
+    angle_init = enc_test.count_pulses ; 
+    for (uint16_t i = 0; i<TOP_VALUE_COUNT;i++){
+        bridge_h.percent_r = i ; 
+        set_pwm(&bridge_h)   ;
+        sleep_ms(100) ; 
+        getData(&enc_test) ;   
+        if (angle_init != enc_test.count_pulses){
+            set_minsa(i) ; 
+            break ; 
+        }
+    }
     setttings_pid(KP,KD,KI) ; 
     multicore_launch_core1(core1task); ///START CORE1 
+    fsm_init(0.001) ; 
     struct repeating_timer timer                                  ;
     add_repeating_timer_ms(SAMPLING_TIME,&systick, NULL, &timer ) ; 
-    fsm_init(0.001) ; 
-    printf("FSM_ON \r\n") ;
-    encoder_quad_t enc_test ; 
     while (1) {
         if (new_cmd == true){
             new_cmd = false ; 

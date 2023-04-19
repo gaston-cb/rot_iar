@@ -18,30 +18,20 @@ void init_switch(uint switch_port_a, uint switch_port_b){
 }
  
 /**
- * @brief 
+ * @brief Detecta que final de carrera se activa 
  * 
- * @return uint8_t 0: closed switch  
- *                 1: open switch port a 
- *                 2: open switch port b 
+ * @return uint8_t 0: open switch  
+ *                 1: close switch port a 
+ *                 2: close switch port b 
  */                 
 uint8_t isSwitchOn(){
-
     uint8_t state_return = 0  ; 
-
     if ( gpio_get( limit_switch.limit_switch_port_a ) == LEVEL_DETECTED_CLOSE_SWITCH){
-
         state_return = 1 ; 
-
     } ; 
 
-    if ( gpio_get( limit_switch.limit_switch_port_a ) == LEVEL_DETECTED_CLOSE_SWITCH){
-
+    if ( gpio_get( limit_switch.limit_switch_port_b ) == LEVEL_DETECTED_CLOSE_SWITCH){
         state_return = 2 ; 
-
     } ; 
-
-
-
     return state_return ; 
-
 } 

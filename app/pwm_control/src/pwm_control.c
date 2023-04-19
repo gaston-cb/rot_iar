@@ -12,9 +12,9 @@ void init_pwm(BTS7960_t *config_port )
 {
 ///FIXME: AGREGAR MANEJEO DE ERRORES - > ASERT O PUNTERO A FUNCIONES 
     memcpy(&pwm_ports ,config_port,sizeof(BTS7960_t))    ; 
-    gpio_set_function(pwm_ports.port_h, GPIO_FUNC_PWM)   ;
+    gpio_set_function(pwm_ports.port_r, GPIO_FUNC_PWM)   ;
     gpio_set_function(pwm_ports.port_l, GPIO_FUNC_PWM)   ;   
-    slice_num_0 = pwm_gpio_to_slice_num(pwm_ports.port_h);
+    slice_num_0 = pwm_gpio_to_slice_num(pwm_ports.port_r);
     slice_num_1 = pwm_gpio_to_slice_num(pwm_ports.port_l);
     pwm_set_chan_level(slice_num_0, PWM_CHAN_A, 0)       ;
     pwm_set_chan_level(slice_num_1, PWM_CHAN_A, 0)       ;
@@ -29,7 +29,7 @@ void init_pwm(BTS7960_t *config_port )
 void set_pwm(BTS7960_t *config_port ){ 
     ///assert(isInit!=true) ; 
     memcpy(&pwm_ports ,config_port,sizeof(BTS7960_t))          ; 
-    pwm_set_gpio_level (pwm_ports.port_h, pwm_ports.percent_h) ; 
+    pwm_set_gpio_level (pwm_ports.port_r, pwm_ports.percent_r) ; 
     pwm_set_gpio_level (pwm_ports.port_l, pwm_ports.percent_l) ; 
 }
 
